@@ -117,7 +117,44 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"src/models/User.ts":[function(require,module,exports) {
+})({"src/models/Eventing.ts":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Eventing = void 0;
+
+var Eventing =
+/** @class */
+function () {
+  function Eventing() {
+    this.events = {};
+  }
+
+  Eventing.prototype.on = function (eventName, callback) {
+    var handlers = this.events[eventName] || [];
+    handlers.push(callback);
+    this.events[eventName] = handlers;
+  };
+
+  Eventing.prototype.trigger = function (eventName) {
+    var handlers = this.events[eventName];
+
+    if (!handlers || handlers.length === 0) {
+      return;
+    }
+
+    handlers.forEach(function (callback) {
+      callback();
+    });
+  };
+
+  return Eventing;
+}();
+
+exports.Eventing = Eventing;
+},{}],"src/models/User.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -125,22 +162,29 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.User = void 0;
 
+var Eventing_1 = require("./Eventing");
+
 var User =
 /** @class */
 function () {
   function User(data) {
     this.data = data;
+    this.events = new Eventing_1.Eventing();
   }
 
   User.prototype.get = function (propName) {
     return this.data[propName];
   };
 
+  User.prototype.set = function (update) {
+    Object.assign(this.data, update);
+  };
+
   return User;
 }();
 
 exports.User = User;
-},{}],"src/index.ts":[function(require,module,exports) {
+},{"./Eventing":"src/models/Eventing.ts"}],"src/index.ts":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -150,11 +194,13 @@ Object.defineProperty(exports, "__esModule", {
 var User_1 = require("./models/User");
 
 var user = new User_1.User({
-  name: "myname",
-  age: 20
+  name: "new record",
+  age: 0
 });
-console.log(user.get("name"));
-console.log(user.get("age"));
+user.events.on("change", function () {
+  console.log("change!");
+});
+user.events.trigger("change");
 },{"./models/User":"src/models/User.ts"}],"C:/Users/alamg/AppData/Roaming/nvm/v16.13.2/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -183,7 +229,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "5936" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "9818" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
