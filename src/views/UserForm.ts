@@ -32,7 +32,7 @@ export class UserForms extends View<User, UserProps> {
     return `
       <div>
         <input placeholder="${this.model.get("name")}" />
-        <button class="set-name">Click Name</button>
+        <button class="set-name">Change Name</button>
         <button class="set-age">Set Random Age</button>
         <button class="save-model">Save User</button>
       </div>
